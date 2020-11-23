@@ -35,9 +35,9 @@ def add_options(options):
     return _add_options
 
 
-def add_svc_command(no_command=None):
+def add_svc_command(svc_main=lambda ctx: ctx.obj.run()):
     def _svc_command(func):
-        svc.__no_command__ = no_command
+        svc.__svc_main__ = svc_main
         func.add_command(svc)
         return func
     return _svc_command
@@ -54,8 +54,8 @@ def svc(ctx, wd):
         extra_args += f'--wd={path}'
         os.chdir(path)
     ctx.obj.register(extra_args)
-    if ctx.invoked_subcommand is None and callable(svc.__no_command__):
-        svc.__no_command__(ctx)
+    if ctx.invoked_subcommand is None and callable(svc.__svc_main__):
+        svc.__svc_main__(ctx)
 
 
 @svc.command()
